@@ -1,41 +1,57 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 *.so
-*.dylib
-*.dll
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Fortran module files
-*.mod
-*.smod
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Environment files
+.env
+.env.local
 
-# Executables
-*.exe
-*.out
-*.app
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
 
-# debug information files
-*.dwo
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend specific
+*.db
+*.sqlite
+*.sqlite3
