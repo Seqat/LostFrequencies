@@ -9,6 +9,9 @@ class OLEDStatus:
         self.i2c = I2C(0, sda=Pin(config.I2C_SDA), scl=Pin(config.I2C_SCL), freq=config.I2C_FREQ)
         self.display = None
         self._last_state = None
+        self.scroll_x = 128
+        self.current_poetry = ""
+        self.pending_poetry = None
         try:
             self._init_display()
         except OSError:
@@ -17,12 +20,21 @@ class OLEDStatus:
     def _init_display(self):
         self.display = SSD1306_I2C(config.OLED_WIDTH, config.OLED_HEIGHT, self.i2c, addr=0x3C)
 
-    def render(self, wifi_status, backend_status, station_freq, mood_depth, label, play_state):
+    def render(self, wifi_status, backend_status, station_freq, mood_depth, poetry, play_state):
         if self.display is None:
             try:
                 self._init_display()
             except OSError:
                 return
+
+        poetry = str(poetry or "")
+        if poetry != self.current_poetry:
+            if not self.current_poetry:
+                self.current_poetry = poetry
+                self.scroll_x = 128
+                self.pending_poetry = None
+            else:
+                self.pending_poetry = poetry
 
         connected = wifi_status == "connected"
         state = (
@@ -31,10 +43,10 @@ class OLEDStatus:
             self._fit(backend_status, 10),
             round(station_freq, 1),
             round(mood_depth, 2),
-            self._fit(label, 16),
             self._fit(play_state, 16),
         )
-        if state == self._last_state:
+        should_redraw = connected and self.current_poetry
+        if state == self._last_state and not should_redraw:
             return
 
         try:
@@ -43,6 +55,7 @@ class OLEDStatus:
             else:
                 self._draw_status_screen(state)
             self._last_state = state
+            self._advance_scroll()
         except OSError:
             # I2C OLEDs can briefly timeout during noisy updates; retry once and
             # keep the rest of the controller alive.
@@ -54,12 +67,13 @@ class OLEDStatus:
                 else:
                     self._draw_status_screen(state)
                 self._last_state = state
+                self._advance_scroll()
             except OSError:
                 self.display = None
                 return
 
     def _draw_status_screen(self, state):
-        _, wifi_status, backend_status, station_freq, mood_depth, label, play_state = state
+        _, wifi_status, backend_status, station_freq, mood_depth, play_state = state
         d = self.display
         d.fill(0)
         d.text("LOSTFREQUENCIES", 0, 0)
@@ -70,7 +84,7 @@ class OLEDStatus:
         d.show()
 
     def _draw_main_screen(self, state):
-        _, _, backend_status, station_freq, mood_depth, label, play_state = state
+        _, _, backend_status, station_freq, mood_depth, play_state = state
         d = self.display
         d.fill(0)
         d.text("FM FREQUENCY", 18, 0)
@@ -96,7 +110,7 @@ class OLEDStatus:
         d.text("{:.1f}".format(station_freq), 46, 28)
         d.text(str(int(config.FM_FREQ_MAX)), 98, 28)
 
-        d.text(self._fit(label.upper(), 12), 18, 40)
+        d.text(self.current_poetry.upper(), self.scroll_x, 40)
         bar_x = 10
         bar_y = 54
         bar_w = 108
@@ -106,6 +120,14 @@ class OLEDStatus:
         if fill_w > 0:
             d.fill_rect(bar_x + 1, bar_y + 1, fill_w, bar_h - 2, 1)
         d.show()
+
+    def _advance_scroll(self):
+        self.scroll_x -= 4
+        if self.scroll_x < -(len(self.current_poetry) * 8):
+            if self.pending_poetry is not None:
+                self.current_poetry = self.pending_poetry
+                self.pending_poetry = None
+            self.scroll_x = 128
 
     @staticmethod
     def _fit(value, limit):

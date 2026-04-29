@@ -1,9 +1,11 @@
+# Configuration constants 
+# Update the Wi-Fi credentials and backend server details as needed.
 WIFI_SSID = "YOUR_WIFI_NAME"
 WIFI_PASSWORD = "YOUR_WIFI_PASSWORD"
 
-BACKEND_HOST = "192.168.1.2"
-BACKEND_PORT = 8000
-BACKEND_PATH = "/generate"
+BACKEND_HOST = "192.168.1.2" # IP address of the backend server
+BACKEND_PORT = 8000 # Port number of the backend server
+BACKEND_PATH = "/generate" 
 DEVICE_ID = "pico-w-01"
 
 POT1_ADC = 26
@@ -27,6 +29,7 @@ AUDIO_RELEASE_MS = 20
 FM_FREQ_MIN = 88.0
 FM_FREQ_MAX = 108.0
 
+# A simple startup melody to play on the Pico's speaker when it boots up.
 STARTUP_MELODY = [
     {"frequency_hz": 293.66, "duration_s": 0.45, "velocity": 0.42, "waveform": "triangle", "rest": False},
     {"frequency_hz": 349.23, "duration_s": 0.35, "velocity": 0.38, "waveform": "triangle", "rest": False},

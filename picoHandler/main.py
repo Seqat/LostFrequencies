@@ -25,7 +25,7 @@ class LostFrequenciesController:
         self.filtered_p2 = 0.0
         self.last_post_ms = 0
         self.last_oled_ms = 0
-        self.current_label = "searching"
+        self.current_poetry = "TUNING THE HORIZON..."
         self.backend_status = "idle"
         self.current_phrase_id = None
 
@@ -65,7 +65,7 @@ class LostFrequenciesController:
             return
 
         self.backend_status = response.get("backend_status", "ok")[:10]
-        self.current_label = response.get("context_label", "farewell")[:16]
+        self.current_poetry = response.get("ai2_generated_poetry", self.current_poetry)
         phrase_id = response.get("phrase_id")
         if phrase_id and phrase_id != self.current_phrase_id:
             notes = self._sanitize_notes(response.get("notes", []))
@@ -85,7 +85,7 @@ class LostFrequenciesController:
             self.backend_status,
             self._station_frequency(),
             round(self.filtered_p2, 2),
-            self.current_label,
+            self.current_poetry,
             self.audio.play_state(),
         )
 
