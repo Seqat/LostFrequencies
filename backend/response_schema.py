@@ -65,6 +65,6 @@ class PhraseResponse(BaseModel):
     tempo_bpm: int = Field(..., ge=40, le=140)
     total_duration_s: float = Field(..., ge=8.0, le=12.0)
     backend_status: str = Field(default="ok", max_length=32)
+    ai2_generated_poetry: str = Field(default="")
     notes: List[NoteEvent]
     debug: Dict[str, Any] = Field(default_factory=dict)
-

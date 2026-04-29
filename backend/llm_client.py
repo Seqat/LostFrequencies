@@ -16,6 +16,8 @@ DEFAULT_INTERPRETATION = {
     "contour": "descending",
     "ornament": "sparse",
     "station_character": "faded signal",
+    "poetry_station_hint": "a half-lost roadside station at dusk",
+    "poetry_mood_tone": "restrained grief, tender and weathered",
 }
 
 
@@ -33,7 +35,7 @@ class LMStudioClient:
     def interpret(self, pot1: float, pot2: float) -> Dict[str, Any]:
         payload = {
             "model": self.model,
-            "temperature": 0.2,
+            "temperature": 0.3,
             "max_tokens": 180,
             "response_format": {"type": "json_object"},
             "messages": [
@@ -43,13 +45,15 @@ class LMStudioClient:
                         "You are the semantic interpretation stage for an interactive generative "
                         "music installation called LostFrequencies. Return only compact JSON with "
                         "keys: mood, imagery, mode_hint, density, tension, contour, ornament, "
-                        "station_character. Context: 1973, farewell, transition, mortality, "
+                        "station_character, poetry_station_hint, poetry_mood_tone. Context: 1973, farewell, transition, mortality, "
                         "legacy, dusty western atmosphere, restrained Dylan-era mood. Pot1 is a "
                         "radio tuning dial scanning ghost stations of memory, so it should affect "
                         "station identity, register, motif flavor, and which emotional channel is "
                         "found. Pot2 is mood depth, so it should control darkness, emotional "
                         "weight, density, and intensity. Avoid direct song quotation, cheerful pop, "
-                        "futuristic language, and long prose."
+                        "futuristic language, and long prose. "
+                        "poetry_station_hint should be a short cinematic station scene for a lyric model. "
+                        "poetry_mood_tone should be a short emotional tone phrase for a lyric model."
                     ),
                 },
                 {
@@ -85,6 +89,12 @@ class LMStudioClient:
         parsed["ornament"] = self._safe_label(parsed.get("ornament"), DEFAULT_INTERPRETATION["ornament"])
         parsed["station_character"] = self._safe_label(
             parsed.get("station_character"), DEFAULT_INTERPRETATION["station_character"], 24
+        )
+        parsed["poetry_station_hint"] = self._safe_label(
+            parsed.get("poetry_station_hint"), DEFAULT_INTERPRETATION["poetry_station_hint"], 64
+        )
+        parsed["poetry_mood_tone"] = self._safe_label(
+            parsed.get("poetry_mood_tone"), DEFAULT_INTERPRETATION["poetry_mood_tone"], 64
         )
         parsed["source"] = "lmstudio"
         return parsed
@@ -122,6 +132,8 @@ class LMStudioClient:
             "contour": contour,
             "ornament": ornament,
             "station_character": station_character,
+            "poetry_station_hint": self._fallback_poetry_station_hint(station),
+            "poetry_mood_tone": self._fallback_poetry_mood_tone(mood_depth),
             "source": source,
         }
 
@@ -165,3 +177,27 @@ class LMStudioClient:
         if not isinstance(value, str) or not value.strip():
             return default
         return value.strip().lower()[:max_len]
+
+    @staticmethod
+    def _fallback_poetry_station_hint(station: float) -> str:
+        if station < 0.2:
+            return "a chapel station buried in static"
+        if station < 0.4:
+            return "a dust road station at dusk"
+        if station < 0.6:
+            return "a highway station near the last horizon"
+        if station < 0.8:
+            return "a county line station with worn headlights"
+        return "a ghost station past midnight"
+
+    @staticmethod
+    def _fallback_poetry_mood_tone(mood_depth: float) -> str:
+        if mood_depth < 0.2:
+            return "barely aching, hushed, almost hopeful"
+        if mood_depth < 0.4:
+            return "wistful, restrained, tender"
+        if mood_depth < 0.6:
+            return "melancholic, lonely, worn"
+        if mood_depth < 0.8:
+            return "heavy, grief-struck, dim"
+        return "heavy, grief-soaked, desolate"
