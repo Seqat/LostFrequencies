@@ -4,7 +4,6 @@ LostFrequencies is an interactive generative music installation built for the CS
 
 The piece is designed around a 1973 farewell atmosphere: transition, mortality, legacy, dusty-western space, and the emotional shadow of "Knockin' on Heaven's Door." Rather than building a generic music toy, the system turns physical interaction into small symbolic musical ideas that feel restrained, reflective, and final-ride cinematic.
 
-
 ## Technical Specifications
 
 ### Backend API
@@ -68,11 +67,13 @@ This separation is deliberate so the system is fast, modular, and easy to explai
 ### 1. Semantic Interpretation (LM Studio)
 
 **System Prompt:**
+
 ```text
 You are the semantic interpretation stage for an interactive generative music installation called LostFrequencies. Return only compact JSON with keys: mood, imagery, mode_hint, density, tension, contour, ornament, station_character, poetry_station_hint, poetry_mood_tone. Context: 1973, farewell, transition, mortality, legacy, dusty western atmosphere, restrained Dylan-era mood. Pot1 is a radio tuning dial scanning ghost stations of memory, so it should affect station identity, register, motif flavor, and which emotional channel is found. Pot2 is mood depth, so it should control darkness, emotional weight, density, and intensity. Avoid direct song quotation, cheerful pop, futuristic language, and long prose. poetry_station_hint should be a short cinematic station scene for a lyric model. poetry_mood_tone should be a short emotional tone phrase for a lyric model.
 ```
 
 **User Prompt Example:**
+
 ```text
 pot1=0.410, pot2=0.730. Interpret pot1 as FM tuning across fragile stations and pot2 as mood depth. Return a restrained musical intention for a short symbolic phrase.
 ```
@@ -80,6 +81,7 @@ pot1=0.410, pot2=0.730. Interpret pot1 as FM tuning across fragile stations and 
 ### 2. NLP Poetry Generation (Hugging Face)
 
 **Prompt Example:**
+
 ```text
 Write exactly one short poetic sentence in English.Style: dusty 1970's western, cinematic, tender, lonely. This sentence is in radio. Return only the sentence, with NO LABELS ORE PREFACE. Do not repeat words or phrases. Do not use bullet points. Keep it under 12 words. Station mood: a dust road station at dusk. Emotional intensity: heavy, grief-struck, dim. Core mood: farewell. Signal character: clear signal. Motion contour: descending. Imagery: dust road dusk.
 ```
@@ -122,6 +124,10 @@ Target hardware:
 - 0.96-inch SSD1306-compatible OLED over I2C
 - PAM8406 amplifier
 - 3W speaker
+
+### Sugessted Wiring Diagram
+
+![Hardware Schematics](public/schematics.png)
 
 Suggested Pico wiring:
 
@@ -239,8 +245,10 @@ curl http://127.0.0.1:1234/v1/models
 
 ## Visual Documentation
 
-- Add a wiring photo here
-- Add an OLED-in-operation photo here
-- Add a backend terminal screenshot here
+### Final Installation
 
+![Final Installation](public/final.jpeg)
 
+### OLED Main Screen
+
+![OLED Main Screen](public/main_screen.jpeg)
